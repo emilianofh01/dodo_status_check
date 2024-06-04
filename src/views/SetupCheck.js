@@ -40,8 +40,12 @@ class SetupCheck extends LitElement {
         this.submitIsDisabled = false;
         return data;
       })();
-
-      this.handleSendData(data);
+      this.dispatchEvent(new CustomEvent('senddata', {
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+        detail: data
+      }))
     } catch (error) {
       console.error("Error al obtener los datos:", error);
       swal({

@@ -6,4 +6,7 @@ export const base = css`
     padding: 0;
     box-sizing: border-box;
   }
+  h2 {
+    margin: 0;
+  }
 `;

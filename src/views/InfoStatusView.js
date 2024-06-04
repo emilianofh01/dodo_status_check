@@ -2,6 +2,16 @@ import { LitElement, css, html } from "lit";
 import { base } from "../assets/styles/base";
 
 import fixIcon from "../assets/fixIcon.png";
+import { map } from "lit/directives/map.js";
+const formatter = new Intl.DateTimeFormat(undefined, {
+  dateStyle: "short",
+  timeStyle: "short"
+});
+
+function getDateFormatted(date){
+  date = new Date(date);
+  return formatter.format(date);
+}
 
 class InfoStatusView extends LitElement {
   static get properties() {
@@ -65,62 +75,71 @@ class InfoStatusView extends LitElement {
   }
 
   render() {
+    if(!this.data || !this.data.client) return "";
     let {
-        
+      order_no,
+      issue,
+      observations, 
+      prediagnosis, 
+      articles,
+      client
     } = this.data;
     return html`
       <header>
         <h1>
           Orden de servicio
-          <span class="order-number">#${this.data?.order_no}</span>
+          <span class="order-number">#${order_no}</span>
         </h1>
-        <p class="issueDescription">${this.issueDescription}</p>
+        <p class="issueDescription">${observations}</p>
         <p class="estimated-delivery">
           Fecha estimada de entrega: ${this.estimatedDeliveryDate}
         </p>
       </header>
-      <section class="timeline">
-        ${this.steps.map(
-          (step, index) => html`
-            <div class="timeline-step">
-              <div>${step.date} &nbsp;</div>
-              <div class="timeline-line"></div>
-              <div>${step.description}</div>
-            </div>
-          `
-        )}
-      </section>
+      ${map(articles, (article, i) => html`
+        <section>
+          <h2>${article.article.name}</h2>
+          <div class="timeline">
+            ${map(article.tasks, (step, index) => html`
+                <div class="timeline-step">
+                  <div>${getDateFormatted(step.completed_at)} &nbsp;</div>
+                  <div class="timeline-line"></div>
+                  <div>${step.name}</div>
+                </div>
+              `)
+            }
+          </div>
+        </section>
+      `)}
 
       <div>
         <h2 class="title-section">Información adicional</h2>
         <div class="additional-info__container">
           <section class="additional-info">
-            ${this.additionalInfo.map(
-              (info) => html`
-                <div class="info-card">
-                  <img style="width: 30px; height: 30px;" src="${fixIcon}" />
-                  <div>
-                    <h3>${info.title}</h3>
-                    <p>${info.description}</p>
-                  </div>
-                </div>
-              `
-            )}
+            <div class="info-card">
+              <img style="width: 30px; height: 30px;" src="${fixIcon}" />
+              <div>
+                <h3>Falla del equipo</h3>
+                <p>${issue}</p>
+              </div>
+            </div>
+            <div class="info-card">
+              <img style="width: 30px; height: 30px;" src="${fixIcon}" />
+              <div>
+                <h3>Prediagnostico</h3>
+                <p>${prediagnosis}</p>
+              </div>
+            </div>
           </section>
           <section class="collectors">
             <h2>¿Quiénes puede recoger?</h2>
-            ${this.collectors.map(
-              (collector) => html`
-                <div class="collector-card">
-                  <img style="width: 30px; height: 30px" src="${fixIcon}" />
-                  <div>
-                    <h3>${collector.name}</h3>
-                    <p>${collector.email}</p>
-                    <p>${collector.phone}</p>
-                  </div>
-                </div>
-              `
-            )}
+            <div class="collector-card">
+              <img style="width: 30px; height: 30px" src="${fixIcon}" />
+              <div>
+                <h3>${client.first_name} ${client.last_name}</h3>
+                <p>${client.email}</p>
+                <p>${client.phone_number}</p>
+              </div>
+            </div>
           </section>
         </div>
       </div>
@@ -196,7 +215,7 @@ class InfoStatusView extends LitElement {
           flex-direction: column;
           justify-content: end;
           gap: 20px;
-
+          flex: 1;
           position: relative
         }
 

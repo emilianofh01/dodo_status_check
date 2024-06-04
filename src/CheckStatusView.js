@@ -38,13 +38,24 @@ export class CheckStatusView extends LitElement {
 
     setTimeout(() => {
       this.isLoading = false;
-    }, 2000);
+    }, 500);
   }
 
-  getOrderData = (data) => {
-    this.data = data.data;
+  getOrderData = (event) => {
+    console.log(event.detail.data);
+    this.data = event.detail.data;
     this.isDataloaded = true;
-    
+  }
+
+  connectedCallback(){
+    super.connectedCallback();
+    (async (resolve, reject) => {
+      let response = await fetch(`https://dodorep.dododev.net/api/order/30MY24TLAG`);
+      let data = await response.json();
+      
+      this.data = data.data;
+      this.isDataloaded = true;
+    })();
   }
 
   render() {
@@ -65,8 +76,8 @@ export class CheckStatusView extends LitElement {
 
             <div class="wrapper__body-content">
               <!-- Contenido -->
-              <dodo-setup-view .handleSendData="${this.getOrderData}"></dodo-setup-view>
-              <dodo-info-status-view data="${this.data}"></dodo-info-status-view>
+              <dodo-setup-view @senddata=${this.getOrderData}></dodo-setup-view>
+              <dodo-info-status-view .data=${this.data}></dodo-info-status-view>
             </div>
           </div>
 
