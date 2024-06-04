@@ -42,8 +42,9 @@ export class CheckStatusView extends LitElement {
   }
 
   getOrderData = (data) => {
-    this.data = data
+    this.data = data.data;
     this.isDataloaded = true;
+    
   }
 
   render() {
@@ -65,7 +66,7 @@ export class CheckStatusView extends LitElement {
             <div class="wrapper__body-content">
               <!-- Contenido -->
               <dodo-setup-view .handleSendData="${this.getOrderData}"></dodo-setup-view>
-              <dodo-info-status-view></dodo-info-status-view>
+              <dodo-info-status-view data="${this.data}"></dodo-info-status-view>
             </div>
           </div>
 

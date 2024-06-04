@@ -33,14 +33,13 @@ class SetupCheck extends LitElement {
     try {
       this.isLoading = true;
       this.submitIsDisabled = true;
-      let data = await new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve({ status: "success", message: "Datos recibidos" });
-        //   reject("Mal chavo");
-          this.isLoading = false;
-          this.submitIsDisabled = false;
-        }, 2000);
-      });
+      let data = await (async (resolve, reject) => {
+        let response = await fetch(`https://dodorep.dododev.net/api/order/${this.codeValue}`);
+        let data = await response.json();
+        this.isLoading = false;
+        this.submitIsDisabled = false;
+        return data;
+      })();
 
       this.handleSendData(data);
     } catch (error) {

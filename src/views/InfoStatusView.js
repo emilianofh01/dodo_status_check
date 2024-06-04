@@ -6,6 +6,7 @@ import fixIcon from "../assets/fixIcon.png";
 class InfoStatusView extends LitElement {
   static get properties() {
     return {
+        data: {type: Object},
       orderNumber: { type: String },
       issueDescription: { type: String },
       estimatedDeliveryDate: { type: String },
@@ -64,11 +65,14 @@ class InfoStatusView extends LitElement {
   }
 
   render() {
+    let {
+        
+    } = this.data;
     return html`
       <header>
         <h1>
           Orden de servicio
-          <span class="order-number">#${this.orderNumber}</span>
+          <span class="order-number">#${this.data?.order_no}</span>
         </h1>
         <p class="issueDescription">${this.issueDescription}</p>
         <p class="estimated-delivery">
