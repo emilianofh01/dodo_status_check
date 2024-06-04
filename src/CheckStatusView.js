@@ -42,24 +42,23 @@ export class CheckStatusView extends LitElement {
   }
 
   getOrderData = (event) => {
-    console.log(event.detail.data);
+    // console.log(event.detail.data);
     this.data = event.detail.data;
     this.isDataloaded = true;
   }
 
-  connectedCallback(){
-    super.connectedCallback();
-    (async (resolve, reject) => {
-      let response = await fetch(`https://dodorep.dododev.net/api/order/30MY24TLAG`);
-      let data = await response.json();
+  // connectedCallback(){
+  //   super.connectedCallback();
+  //   (async (resolve, reject) => {
+  //     let response = await fetch(`https://dodorep.dododev.net/api/order/03JN24UNX4`);
+  //     let data = await response.json();
       
-      this.data = data.data;
-      this.isDataloaded = true;
-    })();
-  }
+  //     this.data = data.data;
+  //     this.isDataloaded = true;
+  //   })();
+  // }
 
   render() {
-    console.log(this.isDataloaded);
     return html`
       <div class="container ${this.isLoading ? "loading" : ""} ${this.isDataloaded ? 'data-loaded' : ''} ">
         <div class="container__loading-view">
@@ -194,7 +193,7 @@ export class CheckStatusView extends LitElement {
         dodo-setup-view {
           opacity: 1;
           max-height: 9999px;
-          overflow: hidden;
+          /* overflow: hidden; */
           visibility: visible;
           transition: all ease 0.25s;
         }

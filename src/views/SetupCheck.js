@@ -34,20 +34,26 @@ class SetupCheck extends LitElement {
       this.isLoading = true;
       this.submitIsDisabled = true;
       let data = await (async (resolve, reject) => {
-        let response = await fetch(`https://dodorep.dododev.net/api/order/${this.codeValue}`);
+        let response = await fetch(
+          `https://dodorep.dododev.net/api/order/${this.codeValue}`
+        );
         let data = await response.json();
         this.isLoading = false;
         this.submitIsDisabled = false;
         return data;
       })();
-      this.dispatchEvent(new CustomEvent('senddata', {
-        bubbles: true,
-        composed: true,
-        cancelable: true,
-        detail: data
-      }))
+      this.dispatchEvent(
+        new CustomEvent("senddata", {
+          bubbles: true,
+          composed: true,
+          cancelable: true,
+          detail: data,
+        })
+      );
     } catch (error) {
       console.error("Error al obtener los datos:", error);
+      this.isLoading = false;
+      this.submitIsDisabled = false;
       swal({
         title: "¡Oh no! Hubo un problema al procesar tu consulta.",
         text: "Verifica la orden de servición e intentelo de nuevo.",

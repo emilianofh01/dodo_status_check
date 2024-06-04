@@ -3,12 +3,19 @@ import { base } from "../assets/styles/base";
 
 import fixIcon from "../assets/fixIcon.png";
 import { map } from "lit/directives/map.js";
+
+const _RESULTS = {
+    "REQUIRES_ACTION": "Requiere acción del cliente",
+    "FLAWED": "Hubo un problema al realizar el servicio",
+    "SUCCESS": "Servicio exitoso"
+}
+
 const formatter = new Intl.DateTimeFormat(undefined, {
   dateStyle: "short",
-  timeStyle: "short"
+  timeStyle: "short",
 });
 
-function getDateFormatted(date){
+function getDateFormatted(date) {
   date = new Date(date);
   return formatter.format(date);
 }
@@ -16,74 +23,30 @@ function getDateFormatted(date){
 class InfoStatusView extends LitElement {
   static get properties() {
     return {
-        data: {type: Object},
-      orderNumber: { type: String },
-      issueDescription: { type: String },
+      data: { type: Object },
       estimatedDeliveryDate: { type: String },
-      steps: { type: Array },
-      additionalInfo: { type: Array },
-      collectors: { type: Array },
     };
+  }
+
+  isLastStep(steps) {
+    console.log(steps);
+    return steps.map((step, index, array) => {
+      return step;
+      step.isLastStep = !steps.tasks[index + 1]?.completed_at;
+      return step;
+    });
   }
 
   constructor() {
     super();
-    this.orderNumber = "21MY241A5W";
-    this.issueDescription =
-      "La pantalla del celular se queda en el logo de inicio y no termina de arrancar. El cliente reporta que el problema comenzó después de una actualización del sistema.";
     this.estimatedDeliveryDate = "30 de mayo del 2024";
-    this.steps = [
-      { date: "12/05/24", description: "Recepción del equipo" },
-      {
-        date: "13/05/24",
-        description: "Evaluación inicial del problema reportado",
-      },
-      {
-        date: "14/05/24",
-        description: "Desmontaje del dispositivo para una inspección",
-      },
-      {
-        date: "16/05/24",
-        description: "Reparación o reemplazo de componentes",
-      },
-      { date: "", description: "Pruebas para asegurar que el equipo funcione" },
-      { date: "", description: "Notificación al cliente" },
-    ];
-    this.additionalInfo = [
-      {
-        title: "Falla del equipo",
-        description: "El equipo se prende y se apaga, solo llega al logo",
-      },
-      {
-        title: "Prediagnostico",
-        description:
-          "Partición en el memoria de arranque posiblemente se corrompió",
-      },
-    ];
-    this.collectors = [
-      {
-        name: "Emiliano Fernández",
-        email: "emi******@hotmail.com",
-        phone: "612****12",
-      },
-      {
-        name: "Emiliano Fernández",
-        email: "emi******@hotmail.com",
-        phone: "612****12",
-      },
-    ];
   }
 
   render() {
-    if(!this.data || !this.data.client) return "";
-    let {
-      order_no,
-      issue,
-      observations, 
-      prediagnosis, 
-      articles,
-      client
-    } = this.data;
+    if (!this.data || !this.data.client) return "";
+    let { order_no, issue, observations, prediagnosis, articles, client } =
+      this.data;
+
     return html`
       <header>
         <h1>
@@ -95,21 +58,41 @@ class InfoStatusView extends LitElement {
           Fecha estimada de entrega: ${this.estimatedDeliveryDate}
         </p>
       </header>
-      ${map(articles, (article, i) => html`
-        <section>
-          <h2>${article.article.name}</h2>
-          <div class="timeline">
-            ${map(article.tasks, (step, index) => html`
-                <div class="timeline-step">
-                  <div>${getDateFormatted(step.completed_at)} &nbsp;</div>
-                  <div class="timeline-line"></div>
-                  <div>${step.name}</div>
-                </div>
-              `)
-            }
-          </div>
-        </section>
-      `)}
+      ${map(
+        articles,
+        (article, i) => article.tasks.length ? html`
+          <section>
+            <h2 class="article_name">${article.article.name} ${_RESULTS[article.result] ? html`<span>${_RESULTS[article.result]}</span>` : ''} </h2>
+            <div class="timeline">
+              ${map(
+                this.isLastStep(article.tasks),
+                (step, index) => html`
+                  <div class="timeline-step">
+                    <div>
+                      ${step.completed_at
+                        ? getDateFormatted(step.completed_at)
+                        : ""}
+                      &nbsp;
+                    </div>
+                    <div
+                      class="timeline-line ${index ===
+                        article.tasks.length - 1 ||
+                      !article.tasks[index + 1].completed_at
+                        ? "last-item"
+                        : ""}"
+                    ></div>
+                    <div>${step.name}</div>
+                  </div>
+                `
+              )}
+              <div class="last_observations">
+                <h4>Ultimas observaciones:</h4>
+                <p>${article.observations.length ? article.observations : "Sin observaciones"}</p>
+              </div>
+            </div>
+          </section>
+        ` : ''
+      )}
 
       <div>
         <h2 class="title-section">Información adicional</h2>
@@ -192,16 +175,55 @@ class InfoStatusView extends LitElement {
         .estimated-delivery {
           font-weight: 600;
         }
+
+        .article_name {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .article_name  span {
+            padding: 5px 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 500px;
+            font-weight: 500;
+        }
+
         .timeline {
           display: flex;
           /* justify-content: space-between; */
           padding: 20px 0;
           border-bottom: 1px solid #eee;
-          align-items: center;
+          /* align-items: center; */
           font-size: 1.4em;
+          flex-wrap: wrap;
+        }
+
+        .timeline > .last_observations {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .last_observations p {
+          background-color: #f5f5f5;
+          width: 100%;
+          box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.16);
+          border: 1px solid #ddd;
+          border-radius: 10px;
+          color: var(--text-secondary-color);
+          font-weight: 600;
+          margin-top: 15px;
+          padding: 10px;
+          height: min-content;
+
+          min-height: 50px
         }
 
         .timeline-line {
+          position: relative;
           height: 2px;
           background: #bebebe;
           width: 100%;
@@ -209,18 +231,41 @@ class InfoStatusView extends LitElement {
           max-width: unset !important;
         }
 
+        .timeline-line.last-item::after {
+          width: 50%;
+        }
+
+        .timeline-line::after {
+          position: absolute;
+          left: 0;
+          top: 0;
+          content: "";
+          height: 100%;
+          width: 100%;
+          background-color: var(--primary-color);
+        }
+
         .timeline-step {
           text-align: center;
           display: flex;
+          justify-content: center;
+          align-items: center;
           flex-direction: column;
-          justify-content: end;
           gap: 20px;
           flex: 1;
-          position: relative
+          height: 100%;
+          position: relative;
         }
 
         .timeline-step::after {
-            position: absolute;
+          content: "";
+          position: absolute;
+          width: 12px;
+          height: 12px;
+          background-color: var(--primary-color);
+          border-radius: 50%;
+          border: 4px solid white;
+          top: 30px;
         }
 
         .timeline-step div {
@@ -260,7 +305,6 @@ class InfoStatusView extends LitElement {
           border: 1px solid #ddd;
           border-radius: 15px;
           padding: 20px;
-          border: 20px;
           height: min-content;
         }
 
