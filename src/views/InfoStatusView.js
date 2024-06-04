@@ -75,9 +75,8 @@ class InfoStatusView extends LitElement {
                       &nbsp;
                     </div>
                     <div
-                      class="timeline-line ${index ===
-                        article.tasks.length - 1 ||
-                      !article.tasks[index + 1].completed_at
+                      class="timeline-line ${!step.completed_at ? 'empty' :
+                      !article.tasks[index + 1]?.completed_at
                         ? "last-item"
                         : ""}"
                     ></div>
@@ -231,6 +230,10 @@ class InfoStatusView extends LitElement {
           max-width: unset !important;
         }
 
+        .timeline-line.empty::after {
+          width: 0%;
+        }
+        
         .timeline-line.last-item::after {
           width: 50%;
         }

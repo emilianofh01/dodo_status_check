@@ -47,16 +47,16 @@ export class CheckStatusView extends LitElement {
     this.isDataloaded = true;
   }
 
-  // connectedCallback(){
-  //   super.connectedCallback();
-  //   (async (resolve, reject) => {
-  //     let response = await fetch(`https://dodorep.dododev.net/api/order/03JN24UNX4`);
-  //     let data = await response.json();
+  connectedCallback(){
+    super.connectedCallback();
+    (async (resolve, reject) => {
+      let response = await fetch(`https://dodorep.dododev.net/api/order/03JN24UNX4`);
+      let data = await response.json();
       
-  //     this.data = data.data;
-  //     this.isDataloaded = true;
-  //   })();
-  // }
+      this.data = data.data;
+      this.isDataloaded = true;
+    })();
+  }
 
   render() {
     return html`
